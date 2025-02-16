@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 ################## BUILDING EURIBOR CURVE ##############
 
 # Defines the Yield Curve Input Data
-#today = ql.Date().todaysDate()
-today = ql.Date(10,ql.February,2025)
+today = ql.Date().todaysDate()
 ql.Settings.instance().evaluationDate = today
 
 # Defines deposit rates (short-term <1year, eg euribor deposits)
@@ -103,13 +102,17 @@ floating_rate_bond.setPricingEngine(bond_engine)
 # Ensures we add a fixing for the required date (archive rate for the bond)
 fixing_date = ql.Date(13, ql.February, 2025) #The fixing date must be adjusted depending on the current day
 fixing_rate = 0.0238  # Past USD Libor 3M fixing
-
 floating_leg_index.addFixing(fixing_date, fixing_rate)
 
 required_fixing_dates = floating_rate_bond.cashflows()
 for cf in required_fixing_dates:
     if isinstance(cf, ql.FloatingRateCoupon):
         print(f"Fixing needed for: {cf.fixingDate()}")
+
+# Calculate NPV of the bond
+npv = floating_rate_bond.NPV()
+print(f"Net Present Value (NPV) of the floating rate bond: {npv:.2f}")
+print("-" * 40)
 
 # Calculates clean bond price
 bond_price = floating_rate_bond.cleanPrice()
