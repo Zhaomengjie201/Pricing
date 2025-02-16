@@ -51,16 +51,21 @@ yield_curve_handle = ql.YieldTermStructureHandle(curve)
 # Extracts rates for plotting
 times = [i / 12.0 for i in range(1, 361)]  # Tenors from 1 month to 30 years
 dates = [today + ql.Period(int(t * 12), ql.Months) for t in times]
-zero_rates = [curve.zeroRate(d, ql.Actual360(), ql.Continuous).rate() for d in dates]
+zero_rates = [curve.zeroRate(d, ql.Actual360(), ql.Continuous).rate()* 100 for d in dates]
+discount_factors = [curve.discount(d) for d in dates]
 
-# Plots the curve
-plt.figure(figsize=(8, 4))
-plt.plot(times, zero_rates, label="EURIBOR Yield Curve", color='blue', linewidth=2)
-plt.xlabel("Time to Maturity (Years)")
-plt.ylabel("Zero Rate")
-plt.title("EURIBOR Yield Curve")
-#plt.legend()
-plt.grid(True)
+# Creates figure and axis
+fig, ax1 = plt.subplots(figsize=(8, 4))
+ax1.set_xlabel("Time to Maturity (Years)")
+ax1.set_ylabel("Zero Rate (%)", color='blue')
+ax1.plot(times, zero_rates, label="Zero Rate", color='blue', linewidth=2)
+ax1.tick_params(axis='y', labelcolor='blue')
+ax2 = ax1.twinx()
+ax2.set_ylabel("Discount Factor", color='red')
+ax2.plot(times, discount_factors, label="Discount Factor", color='red', linestyle="dashed", linewidth=2)
+ax2.tick_params(axis='y', labelcolor='red')
+plt.title("EURIBOR Yield Curve & Discount Factors")
+ax1.grid(True)
 plt.show()
 
 ################### PRICING FLOATING RATE BOND ####################
